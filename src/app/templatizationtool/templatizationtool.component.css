@@ -1,0 +1,48 @@
+/*add css to templatizationtool here*/
+.Name {
+    color: tomato;
+    padding: 10px;
+  }
+  
+  body {
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  button {
+    background-color: cornflowerblue;
+    color: white;
+    border: 0px;
+    padding: 10px;
+    margin: 10px;
+  }
+  
+  .a {
+    background-color: forestgreen;
+  }
+  
+  .b {
+    background-color: tomato;
+  }
+  
+  select {
+    margin: 10px;
+  }
+  
+  input {
+    margin: 10px;
+  }
+  
+  div {
+    margin: auto;
+    width: 75%;
+  }
+  
+  h4 {
+    color: tomato;
+  }
+  
+  .display-block {
+      display: block
+  }
+  
