@@ -34,24 +34,31 @@
     </div>
     <div *ngIf="editSourceUIFlag == true">
         <h3>Tables</h3>
-        <div id = "tables"></div>
-        <select id = "tableselect">{{ editSourceX }}</select>
-        <button id = "addtable" onClick="addTable(editSourceId)">Add Table</button>
-        <div id = "details"></div>
-        <button class = "a" onClick="resetSource(editSourceId, sources[editSourceId].destination)">Reset Source</button>
-        <button class = "a" onClick="saveSource(editSourceId)">Save Source</button>
+        <div id = "tables" [innerHTML]="tablesinnerHTML"></div>
+        <select #tableselect>{{ editSourceX }}</select>
+        <button #addtable (click)="addTable(editSourceId)" [style.visibility] = "tableVisibility">Add Table</button>
+        <div id = "details" [innerHTML] = "detailsinnerHTML"></div>
+        <button class = "a" (click)="resetSource(editSourceId, sources[editSourceId].destination)">Reset Source</button>
+        <button class = "a" (click)="saveSource(editSourceId)">Save Source</button>
     </div>
 </div>
 <div>
-    <button id="addsource" onClick="addSource(false)">New Source +</button>
-    <button class="b" id="dest" onClick="addSource(true)">Set Destination Source</button>
+    <button id="addsource" (click)="addSource(false)">New Source +</button>
+    <button class="b" id="dest" (click)="addSource(true)">Set Destination Source</button>
 </div>
 <div id="rules">
     <h2>Rules</h2>
 </div>
 <div id="newrule"></div>
 <div>
-    <button id="addrule" onClick="addRule(false)">New Rule +</button>
-    <button class="b" id="overall" onClick="addRule(true)">Set Overall Rule</button>
-    <button onClick="submit()">Submit Form</button>
+    <button id="addrule" (click)="addRule(false)">New Rule +</button>
+    <button class="b" id="overall" (click)="addRule(true)">Set Overall Rule</button>
+    <button (click)="submit()">Submit Form</button>
 </div>
+<button (click) = "testFunction(2)">addDetails test button</button>
+
+<div id="testDIV" [innerHTML] = "testinnerHTML"></div>
+<div id="hiddendiv" [style.visibility]="tableVisibility">div is showing</div>
+<hr>
+<h4>Output:</h4>
+<div>{{ outputJson }}</div>
