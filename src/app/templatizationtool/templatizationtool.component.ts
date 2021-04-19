@@ -5,6 +5,7 @@ import { Table } from './model/table.model';
 import { Source } from './model/source.model';
 import { SourceType } from './model/sourcetype.model';
 import { Projection } from './model/projection.model';
+import { Rule } from './model/rule.model';
 
 @Component({
     selector: 'app-templatizationtool',
@@ -13,6 +14,7 @@ import { Projection } from './model/projection.model';
 })
 export class TemplatizationtoolComponent implements OnInit {
 
+    @ViewChild('sources') sourcesElement: ElementRef | undefined;
     @ViewChild('tableselect') tableselectElement: ElementRef | undefined;
     @ViewChild('projections') projectionsElement: ElementRef | undefined;
     @ViewChild('aggselect') aggselectElement: ElementRef | undefined;
@@ -31,6 +33,11 @@ export class TemplatizationtoolComponent implements OnInit {
     @ViewChild('programName') programNameElement: ElementRef | undefined;
     @ViewChild('Version') VersionElement: ElementRef | undefined;
     @ViewChild('AA') AAElement: ElementRef | undefined;
+    @ViewChild('newrule') newruleElement: ElementRef | undefined;
+    @ViewChild('RuleName') RuleNameElement: ElementRef | undefined;
+    @ViewChild('StoreAs') StoreAsElement: ElementRef | undefined;
+    @ViewChild('Expression') ExpressionElement: ElementRef | undefined;
+    @ViewChild('rules') rulesElement: ElementRef | undefined;
 
     alertMessage: SafeHtml = "";
     sources: any = [];
@@ -56,8 +63,13 @@ export class TemplatizationtoolComponent implements OnInit {
     detailsinnerHTML: string = "";
     testinnerHTML: string = "";
     tableVisibility: string = "";
+    destVisibility: string = "";
+    addsourceVisibility: string = "";
+    addruleVisibility: string = "";
+    overallVisibility: string = "";
     output: any;
     outputJson: string = "No output as of yet";
+    testVariable: number = 9;
 
     meta: {key: string, value: string}[] = [
         {key: 'acr', value: '[pi].[modernazureusagewithvorg]'},
@@ -74,6 +86,9 @@ export class TemplatizationtoolComponent implements OnInit {
     constructor() { }
 
     ngOnInit(): void {
+        this.DB.push(new Table('acr', ['vOrgMpnId', 'AccountId', 'CustomerTenantId', 'AzureConsumedRevenueCD', 'Dim_DateId', 'ServiceInfluencer', 'isDuplicateatvorgLevel']));
+        this.DB.push(new Table('competency', ['AccountId', 'CompetencyName', 'CompetencyLevel', 'ActivationStatus' ]));
+        this.DB.push(new Table('training', ['AccountId', 'PUID', 'SkillId', 'McpId']));
     }
 
     resetMessage() {
@@ -139,15 +154,42 @@ export class TemplatizationtoolComponent implements OnInit {
             x.push(this.sources[id].measures[i].alias);
             else x.push(this.sources[id].measures[i].column);
         }
-        // Object.values(DB).forEach(obj => {
-        //     if (obj.name == `source${id + 1}`)
-        //     obj = new Table(alias, x);
-        // })
+        Object.values(this.DB).forEach(obj => {
+            // if (obj.name == `source${id + 1}`)
+            // obj = new Table(alias, x);
+        })
         this.DB.push(new Table(alias, x));
     }
 
     addSource(destination: boolean) {
-
+        this.alertMessage += "entered into addSource function :-)";
+        this.sourcecount += 1;
+        this.alertMessage += "increased sourcecount by 1. current value of sourcecount = " + this.sourcecount + "<br>";
+        var a = this.sourcesElement?.nativeElement.innerHTML;
+        var b = new Source(this.sourcecount);
+        b.sourceType = new SourceType(`source${this.sourcecount}`);
+        b.datasourceid = this.sourcecount;
+        b.tablecount = 0;
+        if (destination == true) {
+            b.destination = destination;
+            this.addsourceVisibility = "hidden";
+            this.destVisibility = "hidden";
+        }
+        this.sources.push(b);
+        this.alertMessage += "pushed newly created source into sources.<br>current sources value = " + this.sources + "<br>";
+        console.log(this.sources);
+        var x = "";
+        for (var i = 0; i < this.DB.length; i++) {
+            x = x + "<option value=" + this.DB[i].name + ">" + this.DB[i].name + "</option>";
+        }
+        console.log("x = " + x);
+        console.log("sourcesElement = " + this.sourcesElement);
+        if(this.sourcesElement) {
+            console.log("preparing to add innerHTML");
+            this.sourcesElement.nativeElement.innerHTML = a + `<h3>Source` + this.sourcecount + `</h3><div id = "source` + this.sourcecount + `"><h3>Tables</h3>
+                            <div id = "tables"></div><select id = "tableselect">${x}</select><button id = "addtable" (click)="addTable(${this.sourcecount})">Add Table</button><div id = "details"></div><p></p><button class = "a" (click)="resetSource(${this.sourcecount - 1}, ${destination})">Reset Source</button><button class = "a" (click)="saveSource(${this.sourcecount - 1})">Save Source</button></div>`
+        }
+        this.alertMessage += "exiting addSource function";
     }
 
     editSource(id: number) {
@@ -158,8 +200,8 @@ export class TemplatizationtoolComponent implements OnInit {
         b.tablecount = 0;
         if (this.sources[id].destination == true) {
             b.destination = this.sources[id].destination;
-            // document.getElementById(`addsource`).style.visibility = "hidden";
-            // document.getElementById(`dest`).style.visibility = "hidden";
+            this.addsourceVisibility = "hidden";
+            this.destVisibility = "hidden";
         }
         this.sources[id] = b;
         this.editSourceX = "";
@@ -185,12 +227,38 @@ export class TemplatizationtoolComponent implements OnInit {
         this.addDetails(id);
     }
 
-    resetSource(id: number, dest: boolean) {
-
+    resetSource(id: number, destination: boolean) {
+        var b = new Source(id + 1);
+        b.sourceType = new SourceType(`source${id + 1}`);
+        b.datasourceid = id + 1;
+        b.tablecount = 0;
+        b.destination = destination;
+        this.sources[id] = b;
+        var x = "";
+        for (var i = 0; i < this.DB.length; i++) {
+            x = x + "<option value=" + this.DB[i].name + ">" + this.DB[i].name + "</option>";
+        }
+        // document.getElementById(`source${id + 1}`).innerHTML = `<h3>Tables</h3>
+        //                   <div id = "tables"></div><select id = "tableselect">${x}</select><button id = "addtable" onClick="addTable(${id + 1})">Add Table</button><div id = "details"></div><p></p><button class = "a" onClick="resetSource(${id}, ${destination})">Reset Source</button><button class = "a" onClick="saveSource(${id})">Save Source</button></div>`
     }
 
     saveSource(id: number) {
-
+        if (this.sources[id].tablecount > 1) {
+            for (var i = 0; i < this.sources[id].tablecount - 1; i++) {
+                // this.sources[id].jointype.push(document.getElementById(`jointype${i + 1}`).value);
+                // this.sources[id].joincondition.push(document.getElementById(`joincondition${i + 1}`).value);
+            }
+        }
+        // document.getElementById(`source${id + 1}`).innerHTML =
+        // `
+        //                 datasourceid: ${this.sources[id].datasourceid} <br>
+        //                 Tables: ${this.sources[id].tables} <br>
+        //                 Projections: ${document.getElementById('projections').innerHTML} <br>
+        //                 Filters: ${document.getElementById('filters').innerHTML} <br>
+        //                 Order By: ${this.sources[id].rowOrder} <br>
+        //                 <button class = "b" onClick = "editSource(${this.sourcecount})" > Edit Source</button>
+        //             `
+        this.pushTableToDB(`source${id + 1}`, id);
     }
 
     addDetails(id: number) {
@@ -209,48 +277,48 @@ export class TemplatizationtoolComponent implements OnInit {
             }
         
         this.detailsinnerHTML = `<h3>Projections</h3>
-                            <div id = "projections"></div>
+                            <div #projections></div>
                             <div>
                                 <h4>Aggregation</h4>
-                            <select id = "aggselect">agg</select>
+                            <select #aggselect>agg</select>
                                 <h4>Column</h4>
-                            <select id = "measureselect">` + x + `</select>
+                            <select #measureselect>` + x + `</select>
                                 <h4>Calculations</h4>
-                            <input id = "operations" type = "textarea" placeholder = "Operations"></input>
+                            <input #operations type = "textarea" placeholder = "Operations"></input>
                             AS
                                 <h4>Alias</h4>
-                            <input id = "Name" type = "textarea" placeholder = "Alternative Name"></input>
+                            <input #Name type = "textarea" placeholder = "Alternative Name"></input>
                             </div>
                             <br>
                             <button onClick="addProjection(sourcecount-1)">Add Projection +</button>
                             <h3>Filters</h3>
-                            <div id = "filters"></div>
+                            <div #filters></div>
                             <div>
                                 <h4>Left Side Aggregator</h4>
-                            <select id = "aggselect1">agg</select>
+                            <select #aggselect1>agg</select>
                                 <h4>Left Side Projection</h4>
-                            <select id = "measureselect1">` + x + `</select>
+                            <select #measureselect1>` + x + `</select>
                                 <h4>Left Side Operations</h4>
-                            <input id = "operations1" type = "textarea" placeholder = "Operations"></input>
+                            <input #operations1 type = "textarea" placeholder = "Operations"></input>
                                 <h4>Comparator</h4>
-                            <select id = "comparator">comp</select>
+                            <select #comparator>comp</select>
                             <br>
                                 <h4>Right Side Aggregator</h4>
-                            <select id = "aggselect2">agg</select>
+                            <select #aggselect2>agg</select>
                                 <h4>Right Side Projection</h4>
-                            <select id = "measureselect2">` + x + `</select>
+                            <select #measureselect2>` + x + `</select>
                                 <h4>Right Side Operations</h4>
-                            <input id = "operations2" type = "textarea" placeholder = "Operations"></input>
+                            <input #operations2 type = "textarea" placeholder = "Operations"></input>
                                 <h4>Conjunction To Next Filter (If Any)</h4>
-                            <select id = "conjunction"><option value = ""></option><option value = "AND">AND</option><option value = "OR">OR</option></select>
+                            <select #conjunction><option value = ""></option><option value = "AND">AND</option><option value = "OR">OR</option></select>
                             </div>
                             <br>
                             <button onClick="addFilter(sourcecount-1)">Add Filter +</button>
                             <h3>Order By</h3>
-                            <div id = "order"></div>
-                            <select id = "orderselect">` + x + `</select>
-                            <select id = "asc"><option value = "ASC">Ascending</option><option value = "DESC">Desccending</option></select>
-                            <button id = "orderbutton" onClick="addOrder(sourcecount-1)">Set Order</button>
+                            <div #order></div>
+                            <select #orderselect>` + x + `</select>
+                            <select #asc><option value = "ASC">Ascending</option><option value = "DESC">Desccending</option></select>
+                            <button #orderbutton onClick="addOrder(sourcecount-1)">Set Order</button>
                             `;
         }
     }
@@ -293,11 +361,49 @@ export class TemplatizationtoolComponent implements OnInit {
     }
 
     addRule(overallRule: boolean) {
-
+        this.rulecount += 1;
+        var b = new Rule();
+        
+        this.addruleVisibility = "hidden";
+        this.overallVisibility = "hidden";
+        if (overallRule == true) {
+            this.OverallRule = b;
+        }
+        else
+            this.rules.push(b);
+        var x = "";
+        for (var i = 0; i < this.DB.length; i++) {
+            x = x + "<option value=" + this.DB[i].name + ">" + this.DB[i].name + "</option>";
+        }
+        if(this.newruleElement)
+            this.newruleElement.nativeElement.innerHTML = `
+                                    <h4>Name</h4>
+                                <input #RuleName type = "textarea" placeholder = "Rule Name"></input>
+                                    <h4>StoreAs</h4>
+                                <input #StoreAs type = "textarea" placeholder = "StoreAs"></input>
+                                    <h4>Expression</h4>
+                                <input #Expression type = "textarea" placeholder = "Expression"></input>
+                                <button class = "b" onClick = "saveRule(${this.rulecount - 1}, ${overallRule})" > Save Rule</button>
+                `
     }
 
     saveRule(id: number, overallRule: boolean) {
-
+        if(this.rulesElement)
+            this.rulesElement.nativeElement.innerHTML += `<h4>Rule ${this.RuleNameElement?.nativeElement.value} Stored As ${this.StoreAsElement?.nativeElement.value}</h4><h5>Expression: ${this.ExpressionElement?.nativeElement.value}</h5>`;
+        if (!overallRule) {
+            this.addruleVisibility = "visible";
+            this.overallVisibility = "visible";
+            this.rules[id].Name = this.RuleNameElement?.nativeElement.value;
+            this.rules[id].StoreAs = this.StoreAsElement?.nativeElement.value;
+            this.rules[id].Expression = this.ExpressionElement?.nativeElement.value;
+        }
+        else {
+            this.OverallRule.Name = this.RuleNameElement?.nativeElement.value;
+            this.OverallRule.StoreAs = this.StoreAsElement?.nativeElement.value;
+            this.OverallRule.Expression = this.ExpressionElement?.nativeElement.value;
+        }
+        if(this.newruleElement)
+            this.newruleElement.nativeElement.innerHTML = ``;
     }
 
     convertMetaData() {
@@ -327,9 +433,9 @@ export class TemplatizationtoolComponent implements OnInit {
     }
     
     testFunction(id: number) {
-        this.alertMessage += "argument received = " + id + "<br>";
-        this.testinnerHTML += "testing successful :-)";
-        this.tableVisibility = "hidden";
+        this.alertMessage += "testing is beginning ..............<br>";
+        this.alertMessage += "argument received = " + id + "<br>Check in test div for results<br>";
+        this.testinnerHTML += `test variable is: ` + this.testVariable + ``;
     }
 
 }

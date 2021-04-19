@@ -1,64 +1,69 @@
-<p>templatization tool works!</p>
-<p [innerHTML] = "alertMessage"></p>
-<button (click)="resetMessage()">Reset Alert Message</button>
-<div id="filedrop">
-    <input type="file" id="fileInput" (change)="handleFileInput($event)"/>
-    <button id="import" type="button" (click)="importJson()">Import Json</button>
-</div>
-<div class="Name">
-    Program Name
-    <input id="programName" type="textarea" placeholder="Enter programName">
-    Version
-    <input id="Version" type="textarea" placeholder="Enter Version">
-    Approver Alias
-    <input id="AA" type="textarea" placeholder="Enter Approver Alias">
-</div>
-<div id="sources">
-    <h2>Sources</h2>
-    <div *ngIf="sourcesUIFlag == true">
-        <p>sourcesUIFlag is working :-)</p>
-        <div *ngFor="let i of sourceslen">
-            <h3>Source {{ i }}</h3>
-            <div id = "x">
-                datasourceid: {{ sources[i].datasourceid }} <br>
-                Tables: {{sources[i].tables}} <br>
-                Projections: {{projections}}{{measures}} <br>
-                Filters: {{measureFilter}} AND {{rowFilter}} <br>
-                Order By: {{sources[i].rowOrder}} <br>
+<div class = "main-div">
+    <p>templatization tool works!</p>
+    <p [innerHTML] = "alertMessage"></p>
+    <button (click)="resetMessage()">Reset Alert Message</button>
+    <div #filedrop>
+        <input type="file" #fileInput (change)="handleFileInput($event)"/>
+        <button #import type="button" (click)="importJson()">Import Json</button>
+    </div>
+    <div class="Name">
+        Program Name
+        <input #programName type="textarea" placeholder="Enter programName">
+        Version
+        <input #Version type="textarea" placeholder="Enter Version">
+        Approver Alias
+        <input #AA type="textarea" placeholder="Enter Approver Alias">
+    </div>
+    <div #sources>
+        <h2>Sources</h2>
+        <div *ngIf="sourcesUIFlag == true">
+            <p>sourcesUIFlag is working :-)</p>
+            <div *ngFor="let i of sourceslen">
+                <h3>Source {{ i }}</h3>
+                <!-- <div id = "x">
+                    datasourceid: {{ sources[i].datasourceid }} <br>
+                    Tables: {{sources[i].tables}} <br>
+                    Projections: {{projections}}{{measures}} <br>
+                    Filters: {{measureFilter}} AND {{rowFilter}} <br>
+                    Order By: {{sources[i].rowOrder}} <br>
+                </div> -->
+                <div>
+                    value of i = {{ i }}
+                </div>
+                <button class = "b" (click) = "editSource(i)" > Edit Source</button>
             </div>
-            <div>
-                value of i = {{ i }}
-            </div>
-            <button class = "b" (click) = "editSource(i)" > Edit Source</button>
+        </div>
+        <div *ngIf="editSourceUIFlag == true">
+            <h3>Tables</h3>
+            <div id = "tables" [innerHTML]="tablesinnerHTML"></div>
+            <select #tableselect>{{ editSourceX }}</select>
+            <!-- <button #addtable (click)="addTable(editSourceId)" [style.visibility] = "tableVisibility">Add Table</button>
+            <div id = "details" [innerHTML] = "detailsinnerHTML"></div>
+            <button class = "a" (click)="resetSource(editSourceId, sources[editSourceId].destination)">Reset Source</button>
+            <button class = "a" (click)="saveSource(editSourceId)">Save Source</button> -->
         </div>
     </div>
-    <div *ngIf="editSourceUIFlag == true">
-        <h3>Tables</h3>
-        <div id = "tables" [innerHTML]="tablesinnerHTML"></div>
-        <select #tableselect>{{ editSourceX }}</select>
-        <button #addtable (click)="addTable(editSourceId)" [style.visibility] = "tableVisibility">Add Table</button>
-        <div id = "details" [innerHTML] = "detailsinnerHTML"></div>
-        <button class = "a" (click)="resetSource(editSourceId, sources[editSourceId].destination)">Reset Source</button>
-        <button class = "a" (click)="saveSource(editSourceId)">Save Source</button>
+    <div>
+        <button id="addsource" (click)="addSource(false)" [style.visibility] = "addsourceVisibility">New Source +</button>
+        <button class="b" id="dest" (click)="addSource(true)" [style.visibility] = "destVisibility">Set Destination Source</button>
+    </div>
+    <div #rules>
+        <h2>Rules</h2>
+    </div>
+    <div #newrule></div>
+    <div>
+        <button id="addrule" (click)="addRule(false)" [style.visibility] = "addruleVisibility">New Rule +</button>
+        <button class="b" id="overall" (click)="addRule(true)" [style.visibility] = "overallVisibility">Set Overall Rule</button>
+        <button (click)="submit()">Submit Form</button>
+    </div>
+    <h4>Output:</h4>
+    <div>{{ outputJson }}</div>
+</div>
+<hr>
+<div class = "testing-div">
+    <h5>Test div</h5>
+    <button (click) = "testFunction(2)">Start Testing</button>
+    <br>
+    <div id="testDIV" [innerHTML] = "testinnerHTML">
     </div>
 </div>
-<div>
-    <button id="addsource" (click)="addSource(false)">New Source +</button>
-    <button class="b" id="dest" (click)="addSource(true)">Set Destination Source</button>
-</div>
-<div id="rules">
-    <h2>Rules</h2>
-</div>
-<div id="newrule"></div>
-<div>
-    <button id="addrule" (click)="addRule(false)">New Rule +</button>
-    <button class="b" id="overall" (click)="addRule(true)">Set Overall Rule</button>
-    <button (click)="submit()">Submit Form</button>
-</div>
-<button (click) = "testFunction(2)">addDetails test button</button>
-
-<div id="testDIV" [innerHTML] = "testinnerHTML"></div>
-<div id="hiddendiv" [style.visibility]="tableVisibility">div is showing</div>
-<hr>
-<h4>Output:</h4>
-<div>{{ outputJson }}</div>

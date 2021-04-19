@@ -1,4 +1,10 @@
 /*add css to templatizationtool here*/
+.main-div {
+	margin: 10px;
+	margin-bottom: 20px;
+	width: auto;
+}
+
 .Name {
     color: tomato;
     padding: 10px;
@@ -44,4 +50,9 @@ h4 {
 
 #filedrop {
 	display: block;
+}
+
+.testing-div {
+	padding: 10px;
+	margin: unset;
 }
