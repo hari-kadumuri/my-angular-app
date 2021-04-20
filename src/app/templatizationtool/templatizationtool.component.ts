@@ -49,15 +49,12 @@ export class TemplatizationtoolComponent implements OnInit {
     rules: any = [];
     OverallRule: any = "OverallRule";
     sourceslen: any = [];
-    sourcesUIFlag: boolean = false;
     measureFilter: any;
     rowFilter: any = "row Filter";
     measures: any = "measures";
     projections: any = "projections";
-    DB: any = [];
+    DB: Table[] = [];
     importedFileEvent: any = null;
-    editSourceUIFlag: boolean = false;
-    editSourceX: string = "";
     editSourceId: number = 0;
     tablesinnerHTML: string = "";
     detailsinnerHTML: string = "";
@@ -132,9 +129,21 @@ export class TemplatizationtoolComponent implements OnInit {
                 Object.keys(this.sources[i].rowFilter).forEach(item => rowFilter += Object.values(this.sources[i].rowFilter[item]).join(' ') + " , ");
                 var measureFilter = "";
                 Object.keys(this.sources[i].measureFilter).forEach(item => measureFilter += Object.values(this.sources[i].rowFilter[item]).join(' ') + " , ");
+                if(this.sourcesElement)
+                    this.sourcesElement.nativeElement.innerHTML +=
+            `
+                      <h3>Source${this.sourcecount}</h3>
+                      <div id = "source${this.sourcecount}">
+                       datasourceid: ${this.sources[i].datasourceid} <br>
+                       Tables: ${this.sources[i].tables} <br>
+                       Projections: ${projections}${measures} <br>
+                       Filters: ${measureFilter} AND ${rowFilter} <br>
+                       Order By: ${this.sources[i].rowOrder} <br>
+                      </div>
+                      <button class = "b" onClick = "editSource(${i})" > Edit Source</button>
+                      `
                 this.pushTableToDB(`source${i + 1}`, i);
             }
-            this.sourcesUIFlag = true;
             this.sourceslen = Array(len).fill(0).map((x,i)=>i);
         }
     }
@@ -155,9 +164,10 @@ export class TemplatizationtoolComponent implements OnInit {
             else x.push(this.sources[id].measures[i].column);
         }
         Object.values(this.DB).forEach(obj => {
-            // if (obj.name == `source${id + 1}`)
-            // obj = new Table(alias, x);
+            if (obj.name == `source${id + 1}`)
+                obj = new Table(alias, x);
         })
+
         this.DB.push(new Table(alias, x));
     }
 
@@ -204,12 +214,14 @@ export class TemplatizationtoolComponent implements OnInit {
             this.destVisibility = "hidden";
         }
         this.sources[id] = b;
-        this.editSourceX = "";
+        var x = "";
         this.editSourceId = id;
         for (var i = 0; i < this.DB.length - this.sourcecount + id; i++) {
-            this.editSourceX = this.editSourceX + "<option value=" + this.DB[i].name + ">" + this.DB[i].name + "</option>";
+            x = x + "<option value=" + this.DB[i].name + ">" + this.DB[i].name + "</option>";
         }
-        this.editSourceUIFlag = true;
+        // document.getElementById(`source${id + 1}`).innerHTML = `<h3>Tables</h3>
+        //                   <div id = "tables"></div><select id = "tableselect">${x}</select><button id = "addtable" onClick="addTable(${id + 1})">Add Table</button><div id = "details"></div><p></p><button class = "a" onClick="resetSource(${id}, ${this.sources[id].destination})">Reset Source</button><button class = "a" onClick="saveSource(${id})">Save Source</button>`
+
     }
 
     addTable(id: number) {
@@ -410,8 +422,8 @@ export class TemplatizationtoolComponent implements OnInit {
         for (var i = 0; i < this.sources.length; i++) {
             for (var j = 0; j < this.sources[i].tables.length; j++) {
                 if (this.sources[i].tables[j] in this.meta) {
-                this.sources[i].sourceType.tableName = this.meta[this.sources[i].tables[j]];
-                this.sources[i].sourceType.location = "DW";
+                        this.sources[i].sourceType.tableName = this.meta[this.sources[i].tables[j]];
+                        this.sources[i].sourceType.location = "DW";
                 }
             }
         }
