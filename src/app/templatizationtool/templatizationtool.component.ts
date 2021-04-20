@@ -67,6 +67,7 @@ export class TemplatizationtoolComponent implements OnInit {
     output: any;
     outputJson: string = "No output as of yet";
     testVariable: number = 9;
+    sourcesinnerHTML: SafeHtml = "";
 
     meta: {key: string, value: string}[] = [
         {key: 'acr', value: '[pi].[modernazureusagewithvorg]'},
@@ -167,7 +168,6 @@ export class TemplatizationtoolComponent implements OnInit {
             if (obj.name == `source${id + 1}`)
                 obj = new Table(alias, x);
         })
-
         this.DB.push(new Table(alias, x));
     }
 
@@ -196,10 +196,35 @@ export class TemplatizationtoolComponent implements OnInit {
         console.log("sourcesElement = " + this.sourcesElement);
         if(this.sourcesElement) {
             console.log("preparing to add innerHTML");
-            this.sourcesElement.nativeElement.innerHTML = a + `<h3>Source` + this.sourcecount + `</h3><div id = "source` + this.sourcecount + `"><h3>Tables</h3>
-                            <div id = "tables"></div><select id = "tableselect">${x}</select><button id = "addtable" (click)="addTable(${this.sourcecount})">Add Table</button><div id = "details"></div><p></p><button class = "a" (click)="resetSource(${this.sourcecount - 1}, ${destination})">Reset Source</button><button class = "a" (click)="saveSource(${this.sourcecount - 1})">Save Source</button></div>`
+            this.sourcesElement.nativeElement.innerHTML += a + `
+                <h3>Source` + this.sourcecount + `</h3>
+                <div id = "source` + this.sourcecount + `">
+                <h3>Tables</h3>
+                <div id = "tables"></div>
+                    <select id = "tableselect">${x}</select>
+                    <button #addtable (click)="addTable(${this.sourcecount})">Add Table</button>
+                    <div id = "details"></div>
+                    <p></p>
+                    <button class = "a" (click)="resetSource(${this.sourcecount - 1}, ${destination})">Reset Source</button>
+                    <button class = "a" (click)="saveSource(${this.sourcecount - 1})">Save Source</button>
+                </div>
+            `;
+            // this.sourcesinnerHTML += a + `
+            //     <h3>Source` + this.sourcecount + `</h3>
+            //     <div id = "source` + this.sourcecount + `">
+            //     <h3>Tables</h3>
+            //     <div id = "tables"></div>
+            //         <select id = "tableselect">${x}</select>
+            //         <button id = "addtable" (click)="addTable(${this.sourcecount})">Add Table</button>
+            //         <div id = "details"></div>
+            //         <p></p>
+            //         <button class = "a" (click)="resetSource(${this.sourcecount - 1}, ${destination})">Reset Source</button>
+            //         <button class = "a" (click)="saveSource(${this.sourcecount - 1})">Save Source</button>
+            //     </div>
+            // `;
         }
         this.alertMessage += "exiting addSource function";
+        console.log(this.sourcesElement);
     }
 
     editSource(id: number) {
@@ -225,16 +250,18 @@ export class TemplatizationtoolComponent implements OnInit {
     }
 
     addTable(id: number) {
+        console.log("priting parent sources element: ");
+        console.log(this.sourcesElement);
         var source = this.sources[id - 1];
         source.tablecount += 1;
         this.tablesinnerHTML += this.tableselectElement?.nativeElement.value + ", ";
         source.tables.push(this.tableselectElement?.nativeElement.value);
-        // if (source.tablecount > 1) {
-        //     var a = document.getElementById(source[this.sourcecount]).innerHTML;
-        //     document.getElementById(`source${sourcecount}`).innerHTML = `<h4>What Type of Join Should these Tables have?</h4>
-        //                     <input id = "jointype${source.tablecount - 1}" type = "textarea" placeholder = "Join Type"></input>
-        //                     <input id = "joincondition${source.tablecount - 1}" type = "textarea" placeholder = "Join Condition"></input>` + a;
-        // }
+        if (source.tablecount > 1) {
+            // var a = document.getElementById(`source${sourcecount}`).innerHTML;
+            // document.getElementById(`source${sourcecount}`).innerHTML = `<h4>What Type of Join Should these Tables have?</h4>
+            //             <input id = "jointype${source.tablecount - 1}" type = "textarea" placeholder = "Join Type"></input>
+            //             <input id = "joincondition${source.tablecount - 1}" type = "textarea" placeholder = "Join Condition"></input>` + a;
+        }
         this.sources[id - 1] = source;
         this.addDetails(id);
     }
